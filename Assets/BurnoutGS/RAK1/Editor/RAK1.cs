@@ -242,19 +242,14 @@ public class OffTheWall : EditorWindow
                 case 0:
                     model_number++;
                     repaint_editor = true;
-                    if (model_number == mL_meshes.Count) // if we are on the last model
+                    if (model_number >= mL_meshes.Count) // if we are on the last model
                     {
-
-                        reachedEndofList = true;
-                        
-                    }
-
-                    if (model_number > mL_meshes.Count)
-                    {
-                        reachedEndofList = false;
                         model_number = 0;
+
+
                     }
 
+                 
 
                     break;
                 case 1:
@@ -329,17 +324,11 @@ public class OffTheWall : EditorWindow
         {
             case 0: // models
                 {
-                    if (gameObject && !reachedEndofList)
+                    if (gameObject)
                     {
                         DisplayModels();
                     }
-                    else if (reachedEndofList)
-                    {
-                        DisplayAddModelPrompt();
-                    }
-
-
-                    if (_DEBUG)
+                   if (_DEBUG)
                     {
                         GUILayout.BeginHorizontal();
                         GUILayout.Box(model_number.ToString());
