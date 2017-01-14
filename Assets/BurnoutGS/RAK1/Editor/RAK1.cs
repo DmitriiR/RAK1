@@ -984,14 +984,43 @@ public class OffTheWall : EditorWindow
                         }
                         AssetDatabase.ImportAsset(assetPath);
                         GameObject temp_object = AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject)) as GameObject;
-                        UnityEngine.Object prefab = PrefabUtility.GetPrefabObject(temp_object);
-
+                        //UnityEngine.Object prefab = PrefabUtility.GetPrefabObject(temp_object);
+                    
                         if (temp_object)
-                            mL_meshes.Add((GameObject)prefab);
+                            mL_meshes.Add(temp_object);
                     }
+                else if (extent == ".fbx")
+                {
+                    string filename = file.Name;
+                    string extension = file.Extension;
+                    string strippedName = filename.Replace(extension, "");
+                    mL_filenames.Add(strippedName);
+                    string assetPath = "Assets/BurnoutGS/RAK1/UserModels/" + filename;
 
-                    progress += 1.0f;
+                    EditorUtility.DisplayProgressBar("Importing user Models", "Importing " + assetPath, progress / info.Length);
+
+                    // Copy to UserModels folder
+                    try
+                    {
+                        File.Copy(file.FullName, Application.dataPath + "/BurnoutGS/RAK1/UserModels/" + filename);
+                    }
+                    catch
+                    {
+                        Debug.Log("could not copy " + filename.ToString());
+                    }
+                    AssetDatabase.ImportAsset(assetPath);
+                    GameObject temp_object = AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject)) as GameObject;
+                    UnityEngine.Object prefab = PrefabUtility.GetPrefabObject(temp_object);
+
+                   // if (temp_object)
+                  //      mL_meshes.Add(prefab);
                 }
+                progress += 1.0f;
+                }
+
+
+
+
 
                 EditorUtility.ClearProgressBar();
 
