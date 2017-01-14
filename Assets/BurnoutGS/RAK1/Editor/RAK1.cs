@@ -223,15 +223,7 @@ public class OffTheWall : EditorWindow
                     repaint_editor = true;
                     if (decal_number < 0) { decal_number = mL_decals.Count - 1; }
                     break;
-                    /*
-                case 2:
-                    user_number--;
-                    repaint_editor = true;
-                    if (user_number < 0) { user_number = mL_userModels.Count - 1; }
-                    break;
-                default:
-                    break;
-                    */
+     
             }
         }
         
@@ -257,25 +249,15 @@ public class OffTheWall : EditorWindow
                     repaint_editor = true;
                     if (decal_number >= mL_decals.Count) { decal_number = 0; }
                     break;
-                    /*
-                case 2:
-                    user_number++;
-                    repaint_editor = true;
-                    if (user_number >= mL_userModels.Count) { user_number = 0; }
-                    break;
-                default:
-                    break;
-                    */
-            }
+                    
+               }
 
         }
         GUILayout.EndHorizontal();
 
         CreateButtons();
 
-        GUILayout.BeginHorizontal();
-        
-        GUILayout.EndHorizontal();
+     
 
 
 
@@ -313,7 +295,11 @@ public class OffTheWall : EditorWindow
             AddUserModelButton();
         }
         if (GUILayout.Button("-"))
-        { }
+        {
+            mL_meshes.Remove(mL_meshes[model_number]);
+            model_number--;
+            repaint_editor = true;
+        }
 
 
         EditorGUILayout.EndHorizontal();
@@ -768,6 +754,7 @@ public class OffTheWall : EditorWindow
     // *********************************
     void CreateButtons()
     {
+        GUILayout.BeginHorizontal();
         if (GUILayout.Button("Create Shared") && gameObject)
         {
             float size = 1.0f;
@@ -825,21 +812,11 @@ public class OffTheWall : EditorWindow
             {
                 objPos = hitInfo.point;
             }
-
             GameObject instance = (GameObject)Instantiate(gameObject, objPos, Quaternion.identity);
-
-
             CreateUniqueMaterial(ref instance);
-            //  if (mb_createNewMaterial && tab == 0)
-            // if (tab == 0)
-            //   {
-            // add to the user container                                                         <<<<< * New feature 
-            // mL_userModels.Add(instance);
-            //   }
-            // Remove 'Clone' from object name
             instance.name = gameObject.name;
-
         }
+            GUILayout.EndHorizontal();
 
     }
 
@@ -984,8 +961,6 @@ public class OffTheWall : EditorWindow
                         }
                         AssetDatabase.ImportAsset(assetPath);
                         GameObject temp_object = AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject)) as GameObject;
-                        //UnityEngine.Object prefab = PrefabUtility.GetPrefabObject(temp_object);
-                    
                         if (temp_object)
                             mL_meshes.Add(temp_object);
                     }
@@ -1009,11 +984,22 @@ public class OffTheWall : EditorWindow
                         Debug.Log("could not copy " + filename.ToString());
                     }
                     AssetDatabase.ImportAsset(assetPath);
-                    GameObject temp_object = AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject)) as GameObject;
-                    UnityEngine.Object prefab = PrefabUtility.GetPrefabObject(temp_object);
+                    GameObject go = AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject)) as GameObject;
+                    /*
+                    //  UnityEngine.Object prefab = PrefabUtility.GetPrefabObject(temp_object);
+                    //  GameObject temp_object;
+                    //    temp_object = PrefabUtility.CreatePrefab(assetPath, temp_object) as GameObject;
 
-                   // if (temp_object)
-                  //      mL_meshes.Add(prefab);
+
+                    // Debug.Log("CreateNew: " + obj.name + " : " + localPath);
+                    UnityEngine.Object prefab = PrefabUtility.CreateEmptyPrefab(assetPath);
+                    PrefabUtility.ReplacePrefab(go, prefab, ReplacePrefabOptions.ConnectToPrefab);
+                    */
+
+                    GameObject temp2 = PrefabUtility.CreatePrefab(assetPath, go);
+                     if (temp2)
+                          mL_meshes.Add(temp2);
+
                 }
                 progress += 1.0f;
                 }
@@ -1028,6 +1014,11 @@ public class OffTheWall : EditorWindow
        // }
 
     }
+
+    
+
+
+
     void AddUserTextureButton()
     {
         if (GUILayout.Button("Add User Textures"))
