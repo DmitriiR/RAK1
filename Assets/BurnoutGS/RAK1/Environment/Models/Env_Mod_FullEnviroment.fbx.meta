@@ -1,0 +1,122 @@
+fileFormatVersion: 2
+guid: 6d73282aab849194a8c9b7e27c1d80f9
+timeCreated: 1446153777
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Env_Mod_AllModels_Room:Env_Mod_Door
+    100002: Env_Mod_AllModels_Room:Env_Mod_DoorFrame
+    100004: Env_Mod_AllModels_Room:Env_Mod_RoomFloorCeiling
+    100006: Env_Mod_AllModels_Room:Env_Mod_RoomWalls
+    100008: Env_Mod_AllModels_Room:Env_Mod_Windows
+    100010: Env_Mod_Door
+    100012: Env_Mod_DoorFrame
+    100014: Env_Mod_Floor_HallCeiling
+    100016: //RootNode
+    100018: Env_Mod_HallLights
+    100020: Env_Mod_HallWalls
+    100022: Env_Mod_HallwayFinal
+    100024: Env_Mod_RoomFinal
+    400000: Env_Mod_AllModels_Room:Env_Mod_Door
+    400002: Env_Mod_AllModels_Room:Env_Mod_DoorFrame
+    400004: Env_Mod_AllModels_Room:Env_Mod_RoomFloorCeiling
+    400006: Env_Mod_AllModels_Room:Env_Mod_RoomWalls
+    400008: Env_Mod_AllModels_Room:Env_Mod_Windows
+    400010: Env_Mod_Door
+    400012: Env_Mod_DoorFrame
+    400014: Env_Mod_Floor_HallCeiling
+    400016: //RootNode
+    400018: Env_Mod_HallLights
+    400020: Env_Mod_HallWalls
+    400022: Env_Mod_HallwayFinal
+    400024: Env_Mod_RoomFinal
+    2300000: Env_Mod_AllModels_Room:Env_Mod_Door
+    2300002: Env_Mod_AllModels_Room:Env_Mod_DoorFrame
+    2300004: Env_Mod_AllModels_Room:Env_Mod_RoomFloorCeiling
+    2300006: Env_Mod_AllModels_Room:Env_Mod_RoomWalls
+    2300008: Env_Mod_AllModels_Room:Env_Mod_Windows
+    2300010: Env_Mod_Door
+    2300012: Env_Mod_DoorFrame
+    2300014: Env_Mod_Floor_HallCeiling
+    2300016: Env_Mod_HallLights
+    2300018: Env_Mod_HallWalls
+    3300000: Env_Mod_AllModels_Room:Env_Mod_Door
+    3300002: Env_Mod_AllModels_Room:Env_Mod_DoorFrame
+    3300004: Env_Mod_AllModels_Room:Env_Mod_RoomFloorCeiling
+    3300006: Env_Mod_AllModels_Room:Env_Mod_RoomWalls
+    3300008: Env_Mod_AllModels_Room:Env_Mod_Windows
+    3300010: Env_Mod_Door
+    3300012: Env_Mod_DoorFrame
+    3300014: Env_Mod_Floor_HallCeiling
+    3300016: Env_Mod_HallLights
+    3300018: Env_Mod_HallWalls
+    4300000: Env_Mod_DoorFrame
+    4300002: Env_Mod_Door
+    4300004: Env_Mod_Floor_HallCeiling
+    4300006: Env_Mod_HallLights
+    4300008: Env_Mod_HallWalls
+    4300010: Env_Mod_AllModels_Room:Env_Mod_RoomWalls
+    4300012: Env_Mod_AllModels_Room:Env_Mod_Windows
+    4300014: Env_Mod_AllModels_Room:Env_Mod_DoorFrame
+    4300016: Env_Mod_AllModels_Room:Env_Mod_Door
+    4300018: Env_Mod_AllModels_Room:Env_Mod_RoomFloorCeiling
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
