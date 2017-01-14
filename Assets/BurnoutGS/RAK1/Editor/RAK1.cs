@@ -105,7 +105,8 @@ public class OffTheWall : EditorWindow
     Editor gameObjectEditor;
     private GameObject gameObject;
     Texture2D logo;
-    GameObject cube;
+    public Vector2 scrolling = new Vector2(1.0f, 1.0f);
+    public Renderer rend;
     public static EditorWindow window;
 
     void OnInspectorUpdate()
@@ -129,7 +130,7 @@ public class OffTheWall : EditorWindow
         
 
         logo = AssetDatabase.LoadAssetAtPath(logoPath + "logo.png", typeof(Texture2D)) as Texture2D;
-        cube = AssetDatabase.LoadAssetAtPath(logoPath + "BlankObj.prefab", typeof(GameObject)) as GameObject;
+        
     }
     public static void LoadModels()
     {
@@ -229,8 +230,7 @@ public class OffTheWall : EditorWindow
     //********************************************************************************//
     public void OnGUI()
     {
-       
-        int tab_save = tab; // needed for return
+       int tab_save = tab; // needed for return
        // tab = GUILayout.Toolbar(tab, new string[] { "Models", "Decals", "User" });
         tab = GUILayout.Toolbar(tab, new string[] { "Models", "Decals"});
         if (tab_save != tab)
@@ -261,9 +261,8 @@ public class OffTheWall : EditorWindow
         EditorGUILayout.EndHorizontal();
  
         ModelSelectionbuttons();
-
         CreateButtons();
-        
+     
         /// Tabs 
         switch (tab)
         {
@@ -272,6 +271,7 @@ public class OffTheWall : EditorWindow
                     if (gameObject)
                     {
                         DisplayModels();
+                       
                     }
                    if (_DEBUG)
                     {
@@ -519,14 +519,12 @@ public class OffTheWall : EditorWindow
                     if (sharedMaterials[i] &&  sharedMaterials[i].GetType() == typeof(ProceduralMaterial))
                     {
                         ProceduralMaterial pm = (ProceduralMaterial)sharedMaterials[i];
-                        if (pm.HasProceduralProperty("proc_pictureInput"))
+
+                            if (pm.HasProceduralProperty("proc_pictureInput"))
                             {
                             EditorGUILayout.LabelField("Texture", (frameskin_number + 1).ToString() + "/" + mL_frameSign.Count.ToString());
                             GUILayout.BeginHorizontal();
-                            if (_DEBUG)
-                            {
-                                GUILayout.Box(frameskin_number.ToString());
-                            }
+                              
 
                             bool contentChanged = false;
                             
@@ -576,7 +574,6 @@ public class OffTheWall : EditorWindow
                                         frameskin_number = userskin_number;
                                         usingUserText = true;
                                         pm.SetProceduralTexture("proc_pictureInput", mL_userTextures[frameskin_number]);
-                                        
                                     }
 
                                 pm.RebuildTextures();
@@ -590,6 +587,112 @@ public class OffTheWall : EditorWindow
 
                 AddUserTextureButton();
 
+                
+        }
+        GUILayout.BeginVertical();
+               ProceduralPropertiesGUI(0);
+        GUILayout.EndHorizontal();
+    }
+
+    void ProceduralPropertiesGUI(int windowId)
+    {
+
+        MeshRenderer[] renderers = gameObject.GetComponents<MeshRenderer>();
+        foreach (MeshRenderer renderer in renderers)
+        {
+           // Material[] sharedMaterials = renderer.sharedMaterials;
+            scrolling = GUILayout.BeginScrollView(scrolling);
+            ProceduralMaterial substance = renderer.sharedMaterial as ProceduralMaterial;
+            ProceduralPropertyDescription[] inputs = substance.GetProceduralPropertyDescriptions();
+            int i = 0;
+            while (i < inputs.Length)
+            {
+                ProceduralPropertyDescription input = inputs[i];
+                ProceduralPropertyType type = input.type;
+                if (type == ProceduralPropertyType.Boolean)
+                {
+                    bool inputBool = substance.GetProceduralBoolean(input.name);
+                    bool oldInputBool = inputBool;
+                    inputBool = GUILayout.Toggle(inputBool, input.name);
+                    if (inputBool != oldInputBool)
+                        substance.SetProceduralBoolean(input.name, inputBool);
+
+                }
+                else
+                    if (type == ProceduralPropertyType.Float)
+                    if (input.hasRange)
+                    {
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label(input.name);
+                        float inputFloat = substance.GetProceduralFloat(input.name);
+                        GUILayout.Label(inputFloat.ToString("#.##"));
+                        float oldInputFloat = inputFloat;
+                        inputFloat = GUILayout.HorizontalSlider(inputFloat, input.minimum, input.maximum);
+                        if (inputFloat != oldInputFloat)
+                            substance.SetProceduralFloat(input.name, inputFloat);
+                        GUILayout.EndHorizontal();
+                    }
+                    else
+                    if (type == ProceduralPropertyType.Vector2 || type == ProceduralPropertyType.Vector3 || type == ProceduralPropertyType.Vector4)
+                        if (input.hasRange)
+                        {
+                            GUILayout.Label(input.name);
+                            int vectorComponentAmount = 4;
+                            if (type == ProceduralPropertyType.Vector2)
+                                vectorComponentAmount = 2;
+
+                            if (type == ProceduralPropertyType.Vector3)
+                                vectorComponentAmount = 3;
+
+                            Vector4 inputVector = substance.GetProceduralVector(input.name);
+                            Vector4 oldInputVector = inputVector;
+                            int c = 0;
+                            while (c < vectorComponentAmount)
+                            {
+                                inputVector[c] = GUILayout.HorizontalSlider(inputVector[c], input.minimum, input.maximum);
+                                c++;
+                            }
+                            if (inputVector != oldInputVector)
+                                substance.SetProceduralVector(input.name, inputVector);
+
+                        }
+                        else
+                        if (type == ProceduralPropertyType.Color3 || type == ProceduralPropertyType.Color4)
+                        {
+                            GUILayout.Label(input.name);
+                            int colorComponentAmount = ((type == ProceduralPropertyType.Color3) ? 3 : 4);
+                            Color colorInput = substance.GetProceduralColor(input.name);
+                            Color oldColorInput = colorInput;
+                            int d = 0;
+                            while (d < colorComponentAmount)
+                            {
+                                colorInput[d] = GUILayout.HorizontalSlider(colorInput[d], 0, 1);
+                                d++;
+                            }
+                            if (colorInput != oldColorInput)
+                                substance.SetProceduralColor(input.name, colorInput);
+
+                        }
+                        else
+                            if (type == ProceduralPropertyType.Enum)
+                        {
+                            GUILayout.Label(input.name);
+                            int enumInput = substance.GetProceduralEnum(input.name);
+                            int oldEnumInput = enumInput;
+                            string[] enumOptions = input.enumOptions;
+                            enumInput = GUILayout.SelectionGrid(enumInput, enumOptions, 1);
+                            if (enumInput != oldEnumInput)
+                                substance.SetProceduralEnum(input.name, enumInput);
+
+                        }
+                i++;
+            }
+            if(GUILayout.Button("Reset"))
+            {
+
+            }
+            substance.RebuildTextures();
+            GUILayout.EndScrollView();
         }
     }
 
@@ -723,70 +826,115 @@ public class OffTheWall : EditorWindow
     void CreateButtons()
     {
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Create Shared") && gameObject)
+
+        if (gameObject.name.Contains("Frame") || tab == 1)
         {
-            float size = 1.0f;
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-
-            // Put object in front of camera
-            if (renderer)
+            if (GUILayout.Button("Create Shared") && gameObject)
             {
-                size = Mathf.Max(size, renderer.bounds.size.x, renderer.bounds.size.y, renderer.bounds.size.z);
+                float size = 1.0f;
+                Renderer renderer = gameObject.GetComponent<Renderer>();
+
+                // Put object in front of camera
+                if (renderer)
+                {
+                    size = Mathf.Max(size, renderer.bounds.size.x, renderer.bounds.size.y, renderer.bounds.size.z);
+                }
+
+                Camera viewCamera = SceneView.lastActiveSceneView.camera;
+                Vector3 objPos = viewCamera.transform.position + viewCamera.transform.forward * size;
+
+                // Move object onto surface that being looked at
+                Ray ray = viewCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
+                RaycastHit hitInfo;
+                if (Physics.Raycast(ray, out hitInfo, 10.0f))
+                {
+                    objPos = hitInfo.point;
+                }
+
+                GameObject instance = (GameObject)Instantiate(gameObject, objPos, Quaternion.identity);
+
+
+                //   if (mb_createNewMaterial && tab == 0)
+                //   {
+                //        CreateUniqueMaterial(ref instance);
+                // add to the user container                                                         <<<<< * New feature 
+                // mL_userModels.Add(instance);
+
+                //    }
+                //   // Remove 'Clone' from object name
+                instance.name = gameObject.name;
+
             }
-
-            Camera viewCamera = SceneView.lastActiveSceneView.camera;
-            Vector3 objPos = viewCamera.transform.position + viewCamera.transform.forward * size;
-
-            // Move object onto surface that being looked at
-            Ray ray = viewCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
-            RaycastHit hitInfo;
-            if (Physics.Raycast(ray, out hitInfo, 10.0f))
+            if (GUILayout.Button("Create Unique") && gameObject)
             {
-                objPos = hitInfo.point;
+                float size = 1.0f;
+                Renderer renderer = gameObject.GetComponent<Renderer>();
+
+                // Put object in front of camera
+                if (renderer)
+                {
+                    size = Mathf.Max(size, renderer.bounds.size.x, renderer.bounds.size.y, renderer.bounds.size.z);
+                }
+
+                Camera viewCamera = SceneView.lastActiveSceneView.camera;
+                Vector3 objPos = viewCamera.transform.position + viewCamera.transform.forward * size;
+
+                // Move object onto surface that being looked at
+                Ray ray = viewCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
+                RaycastHit hitInfo;
+                if (Physics.Raycast(ray, out hitInfo, 10.0f))
+                {
+                    objPos = hitInfo.point;
+                }
+                GameObject instance = (GameObject)Instantiate(gameObject, objPos, Quaternion.identity);
+                CreateUniqueMaterial(ref instance);
+                instance.name = gameObject.name;
             }
-
-            GameObject instance = (GameObject)Instantiate(gameObject, objPos, Quaternion.identity);
-
-
-            //   if (mb_createNewMaterial && tab == 0)
-            //   {
-            //        CreateUniqueMaterial(ref instance);
-            // add to the user container                                                         <<<<< * New feature 
-            // mL_userModels.Add(instance);
-
-            //    }
-            //   // Remove 'Clone' from object name
-            instance.name = gameObject.name;
-
         }
-        if (GUILayout.Button("Create Unique") && gameObject)
+        else
         {
-            float size = 1.0f;
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-
-            // Put object in front of camera
-            if (renderer)
+            if (GUILayout.Button("Create") && gameObject)
             {
-                size = Mathf.Max(size, renderer.bounds.size.x, renderer.bounds.size.y, renderer.bounds.size.z);
-            }
+                float size = 1.0f;
+                Renderer renderer = gameObject.GetComponent<Renderer>();
 
-            Camera viewCamera = SceneView.lastActiveSceneView.camera;
-            Vector3 objPos = viewCamera.transform.position + viewCamera.transform.forward * size;
+                // Put object in front of camera
+                if (renderer)
+                {
+                    size = Mathf.Max(size, renderer.bounds.size.x, renderer.bounds.size.y, renderer.bounds.size.z);
+                }
 
-            // Move object onto surface that being looked at
-            Ray ray = viewCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
-            RaycastHit hitInfo;
-            if (Physics.Raycast(ray, out hitInfo, 10.0f))
-            {
-                objPos = hitInfo.point;
+                Camera viewCamera = SceneView.lastActiveSceneView.camera;
+                Vector3 objPos = viewCamera.transform.position + viewCamera.transform.forward * size;
+
+                // Move object onto surface that being looked at
+                Ray ray = viewCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
+                RaycastHit hitInfo;
+                if (Physics.Raycast(ray, out hitInfo, 10.0f))
+                {
+                    objPos = hitInfo.point;
+                }
+
+                GameObject instance = (GameObject)Instantiate(gameObject, objPos, Quaternion.identity);
+
+
+                //   if (mb_createNewMaterial && tab == 0)
+                //   {
+                //        CreateUniqueMaterial(ref instance);
+                // add to the user container                                                         <<<<< * New feature 
+                // mL_userModels.Add(instance);
+
+                //    }
+                //   // Remove 'Clone' from object name
+                instance.name = gameObject.name;
+
             }
-            GameObject instance = (GameObject)Instantiate(gameObject, objPos, Quaternion.identity);
-            CreateUniqueMaterial(ref instance);
-            instance.name = gameObject.name;
         }
-            GUILayout.EndHorizontal();
 
-    }
+
+        GUILayout.EndHorizontal();
+        } 
+    
 
     
 
@@ -837,10 +985,7 @@ public class OffTheWall : EditorWindow
     // loads the texture 2D structure 
     public static void LoadTEX2DListAtPath(string _path, List<Texture2D> _list, string _ext)
     {
-        if (!AssetDatabase.IsValidFolder(_path))
-        {
-            Debug.Log("NotValidFolder " + _path);
-        }
+      
 
         string assetpath = _path;
         DirectoryInfo dir = new DirectoryInfo(assetpath);
