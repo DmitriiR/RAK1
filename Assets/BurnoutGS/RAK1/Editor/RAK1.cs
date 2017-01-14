@@ -59,6 +59,7 @@ public class OffTheWall : EditorWindow
     // paths
     static string  materialsPath =      "Assets/BurnoutGS/RAK1/Materials/Props/";
     static string  userPath =           "Assets/BurnoutGS/RAK1/UserModels/";
+
     static string  hourGlassPath =      "Assets/BurnoutGS/RAK1/Prefabs/Props/Hourglass/";
     static string  modelsPath =         "Assets/BurnoutGS/RAK1/Prefabs/Props/";
     static string  decalsPath =         "Assets/BurnoutGS/RAK1/Prefabs/Decals/";
@@ -67,6 +68,8 @@ public class OffTheWall : EditorWindow
     static string  sharpSignPath =      "Assets/BurnoutGS/RAK1/Textures/SharpSignAlbedo/";
     static string  triangleSignPath =   "Assets/BurnoutGS/RAK1/Textures/TrianglSignAlbedo/";
     static string  frameSignPath =      "Assets/BurnoutGS/RAK1/Textures/FramePictures/";
+    static string  UserTexturePath =    "Assets/BurnoutGS/RAK1/UserTextures/";
+
     static string  logoPath =           "Assets/BurnoutGS/RAK1/Logo/";
 
     // private
@@ -109,20 +112,56 @@ public class OffTheWall : EditorWindow
     {
         // this.Repaint();
     }
+
     public void OnEnable()
     {
         //  LoadHourHalss();
-
         if (mL_decals.Count == 0)
         {
             LoadTextures();
+          
         }
+
         if (mL_meshes.Count == 0)
         {
             LoadModels();
         }
+        
+
         logo = AssetDatabase.LoadAssetAtPath(logoPath + "logo.png", typeof(Texture2D)) as Texture2D;
         cube = AssetDatabase.LoadAssetAtPath(logoPath + "BlankObj.prefab", typeof(GameObject)) as GameObject;
+    }
+    public static void LoadModels()
+    {
+        //*****************************************************************//
+        // Models  
+        LoadGOListAtPath(modelsPath, mL_meshes, ".prefab");
+        //*****************************************************************//
+        // Decals
+        LoadGOListAtPath(decalsPath, mL_decals, ".prefab");
+        //*****************************************************************//
+        // User
+        LoadGOListAtPath(userPath, mL_meshes, ".prefab");
+       
+    }
+
+    public static void LoadTextures()
+    {
+        //*****************************************************************//
+        // Substances 
+        LoadMATListAtPath(materialsPath, mL_materials, ".sbsar");
+        //*****************************************************************//
+        // textures 
+        LoadTEX2DListAtPath(curevedSignPath, mL_curvedSign, ".png");
+        LoadTEX2DListAtPath(dimondSignPath, mL_dimondSign, ".png");
+        LoadTEX2DListAtPath(sharpSignPath, mL_sharpSign, ".png");
+        LoadTEX2DListAtPath(triangleSignPath, mL_triangleSign, ".png");
+        LoadTEX2DListAtPath(frameSignPath, mL_frameSign, ".png");
+        LoadTEX2DListAtPath(frameSignPath, mL_frameSign, ".tga");
+
+        LoadTEX2DListAtPath(UserTexturePath, mL_frameSign, ".tga");
+        LoadTEX2DListAtPath(UserTexturePath, mL_frameSign, ".png");
+
     }
 
     // draws the model in the editor window
@@ -184,87 +223,6 @@ public class OffTheWall : EditorWindow
         }
     }
     
-    // loaders
-    // Loads the texture pack from resource folder
-    public void Populate()
-    {
-    }
-
-    void DisplayAddModelPrompt()
-    {
-        gameObject = cube;
-        gameObject.transform.localScale = new Vector3(0.1f,0.1f,0.1f);
-        cube.GetComponent<Renderer>().sharedMaterial.mainTexture = logo;
-        AddUserModelButton();
-    }
-
-
-
-    // draws the buttons below the preview window
-    void ModelSelectionbuttons()
-    {
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("< Previous"))
-        {
-            switch (tab)
-            {
-                case 0:
-                    model_number--;
-                    repaint_editor = true;
-                    if (model_number < 0)
-                    {
-                        model_number = mL_meshes.Count - 1;
-                        reachedEndofList = false;
-                    }
-                    break;
-                case 1:
-                    decal_number--;
-                    repaint_editor = true;
-                    if (decal_number < 0) { decal_number = mL_decals.Count - 1; }
-                    break;
-     
-            }
-        }
-        
-        if (GUILayout.Button("Next >"))
-        {
-            switch (tab)
-            {
-                case 0:
-                    model_number++;
-                    repaint_editor = true;
-                    if (model_number >= mL_meshes.Count) // if we are on the last model
-                    {
-                        model_number = 0;
-
-
-                    }
-
-                 
-
-                    break;
-                case 1:
-                    decal_number++;
-                    repaint_editor = true;
-                    if (decal_number >= mL_decals.Count) { decal_number = 0; }
-                    break;
-                    
-               }
-
-        }
-        GUILayout.EndHorizontal();
-
-        CreateButtons();
-
-     
-
-
-
-       
-    }
-
-    
 
     //********************************************************************************//
     // Inspector
@@ -300,11 +258,12 @@ public class OffTheWall : EditorWindow
             model_number--;
             repaint_editor = true;
         }
-
-
         EditorGUILayout.EndHorizontal();
  
-        ModelSelectionbuttons();        
+        ModelSelectionbuttons();
+
+        CreateButtons();
+        
         /// Tabs 
         switch (tab)
         {
@@ -328,7 +287,7 @@ public class OffTheWall : EditorWindow
             case 1: // decals
                 {
 
-                    EditorGUILayout.LabelField("Skin"); //TextArea("Skin");
+                    EditorGUILayout.LabelField("Texture"); //TextArea("Skin");
 
                     GUILayout.BeginHorizontal();
                     if (gameObject)
@@ -347,57 +306,14 @@ public class OffTheWall : EditorWindow
                     }
                 }
                 break;
-            case 2: // user
-                {
-
-                
-                    DisplayUser();
-                
-                    if (_DEBUG)
-                    {
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Box(user_number.ToString());
-                        if(gameObject)
-                        GUILayout.Box(gameObject.name.ToString());
-                        GUILayout.EndHorizontal();
-                    }
-                }
-                break;
+           
             default:
                 break;
         }
 
         //***************************************************************\
         // bottom row
-        GUILayout.BeginHorizontal();
-
-        if (_DEBUG)
-        {
-            if (GUILayout.Button("Reload Assets"))
-            {
-            Populate();
-            // LoadModels();
-            // LoadDecalsFromFolders();
-            }
-        }
-       
    
-
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-
-        // ********** Add Buttons Old 
-        if (tab == 2)
-        {
-          
-        }
-
-
-
-
-        GUILayout.EndHorizontal(); // add user model
-
         // logo
         DrawLogo(logo);
 
@@ -414,7 +330,60 @@ public class OffTheWall : EditorWindow
         public string assetPath;
     };
 
-  
+    // draws the buttons below the preview window
+    void ModelSelectionbuttons()
+    {
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("< Previous"))
+        {
+            switch (tab)
+            {
+                case 0:
+                    model_number--;
+                    repaint_editor = true;
+                    if (model_number < 0)
+                    {
+                        model_number = mL_meshes.Count - 1;
+                        reachedEndofList = false;
+                    }
+                    break;
+                case 1:
+                    decal_number--;
+                    repaint_editor = true;
+                    if (decal_number < 0) { decal_number = mL_decals.Count - 1; }
+                    break;
+
+            }
+        }
+
+        if (GUILayout.Button("Next >"))
+        {
+            switch (tab)
+            {
+                case 0:
+                    model_number++;
+                    repaint_editor = true;
+                    if (model_number >= mL_meshes.Count) // if we are on the last model
+                    {
+                        model_number = 0;
+                    }
+                    break;
+                case 1:
+                    decal_number++;
+                    repaint_editor = true;
+                    if (decal_number >= mL_decals.Count) { decal_number = 0; }
+                    break;
+
+            }
+        }
+        GUILayout.EndHorizontal();
+
+
+
+    }
+
+
 
     private static void CreateUniqueMaterial(ref GameObject instance)
     {
@@ -537,8 +506,7 @@ public class OffTheWall : EditorWindow
         bool usingUserText = false;
 
         if(gameObject)
-            if (gameObject.name.Contains("Frame")
-            && mL_frameSign.Count > 0)
+            if (gameObject.name.Contains("Frame")            )
 
         {
             MeshRenderer[] renderers = gameObject.GetComponents<MeshRenderer>();
@@ -553,7 +521,7 @@ public class OffTheWall : EditorWindow
                         ProceduralMaterial pm = (ProceduralMaterial)sharedMaterials[i];
                         if (pm.HasProceduralProperty("proc_pictureInput"))
                             {
-                            EditorGUILayout.LabelField("Skin", (frameskin_number + 1).ToString() + "/" + mL_frameSign.Count.ToString());
+                            EditorGUILayout.LabelField("Texture", (frameskin_number + 1).ToString() + "/" + mL_frameSign.Count.ToString());
                             GUILayout.BeginHorizontal();
                             if (_DEBUG)
                             {
@@ -820,33 +788,7 @@ public class OffTheWall : EditorWindow
 
     }
 
-    public static void LoadModels()
-    {
-        //*****************************************************************//
-        // Models  
-        LoadGOListAtPath(modelsPath, mL_meshes, ".prefab");
-        //*****************************************************************//
-        // Decals
-        LoadGOListAtPath(decalsPath, mL_decals, ".prefab");
-        //*****************************************************************//
-        // User
-        LoadGOListAtPath(userPath, mL_userModels, ".prefab");
-    }
-
-    public static void LoadTextures()
-    {
-        //*****************************************************************//
-        // Substances 
-        LoadMATListAtPath(materialsPath, mL_materials, ".sbsar");
-        //*****************************************************************//
-        // textures 
-        LoadTEX2DListAtPath(curevedSignPath, mL_curvedSign, ".png");
-        LoadTEX2DListAtPath(dimondSignPath, mL_dimondSign, ".png");
-        LoadTEX2DListAtPath(sharpSignPath, mL_sharpSign, ".png");
-        LoadTEX2DListAtPath(triangleSignPath, mL_triangleSign, ".png");
-        LoadTEX2DListAtPath(frameSignPath, mL_frameSign, ".png");
-        LoadTEX2DListAtPath(frameSignPath, mL_frameSign, ".tga");
-    }
+    
 
     public static void LoadGOListAtPath(string _path, List<GameObject> _list, string _ext)
     {
@@ -895,6 +837,11 @@ public class OffTheWall : EditorWindow
     // loads the texture 2D structure 
     public static void LoadTEX2DListAtPath(string _path, List<Texture2D> _list, string _ext)
     {
+        if (!AssetDatabase.IsValidFolder(_path))
+        {
+            Debug.Log("NotValidFolder " + _path);
+        }
+
         string assetpath = _path;
         DirectoryInfo dir = new DirectoryInfo(assetpath);
         FileInfo[] info = dir.GetFiles("*.*");
@@ -1021,9 +968,10 @@ public class OffTheWall : EditorWindow
 
     void AddUserTextureButton()
     {
-        if (GUILayout.Button("Add User Textures"))
+        if (GUILayout.Button("Add User Texture"))
         {
-            string path = EditorUtility.OpenFolderPanel("Load Textures at Directory", "", "");
+            //string path = EditorUtility.OpenFolderPanel("Load Textures at Directory", "", "");
+            string path = EditorUtility.OpenFilePanel("Load Textures at Directory", "", "psd,tiff,jpg,tga,png,gif,bmp,iff,pict");
 
             if (path.Length != 0)
             {
@@ -1031,8 +979,7 @@ public class OffTheWall : EditorWindow
                 FileInfo[] info = dir.GetFiles("*.*");
 
                 // Create UserTextures folder if not exist
-                string userModelsPath = "Assets/BurnoutGS/RAK1/UserTextures";
-                if (!AssetDatabase.IsValidFolder(userModelsPath))
+                if (!AssetDatabase.IsValidFolder(UserTexturePath))
                 {
                     AssetDatabase.CreateFolder("Assets/BurnoutGS/RAK1", "UserTextures");
                 }
@@ -1048,26 +995,32 @@ public class OffTheWall : EditorWindow
                         string extension = file.Extension;
                         string strippedName = filename.Replace(extension, "");
                         mL_filenames.Add(strippedName);
-                        string assetPath = "Assets/BurnoutGS/RAK1/UserTGextures/" + filename;
+                        string assetPath = UserTexturePath + filename;
 
                         EditorUtility.DisplayProgressBar("Importing user Textures", "Importing " + assetPath, progress / info.Length);
 
                         // Copy to UserModels folder
                         try
                         {
-                            File.Copy(file.FullName, Application.dataPath + "/BurnoutGS/RAK1/UserTextures/" + filename);
+                            File.Copy(file.FullName, Application.dataPath + UserTexturePath + filename);
                         }
                         catch
                         {
                             if (_DEBUG) Debug.Log("could not copy " + filename.ToString());
                         }
+
                         AssetDatabase.ImportAsset(assetPath);
-                        GameObject temp_object = AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject)) as GameObject;
-                        UnityEngine.Object prefab = PrefabUtility.GetPrefabObject(temp_object);
+                        Texture2D temp_Texture = AssetDatabase.LoadAssetAtPath(assetPath, typeof(Texture2D)) as Texture2D;
+                        mL_frameSign.Add(temp_Texture);
+                       
+                        // LoadTEX2DListAtPath(assetPath, mL_frameSign, ".png");
+
+                        //   UnityEngine.Object prefab = PrefabUtility.GetPrefabObject(temp_object);
 
 
-                        if (temp_object)
-                            mL_userTextures.Add((Texture2D)prefab);
+                        //   if (temp_object)
+                        //     mL_frameSign.Add((Texture2D)prefab);
+                        //mL_userTextures.Add((Texture2D)prefab);
                     }
 
                     progress += 1.0f;
@@ -1163,8 +1116,10 @@ public class OffTheWall : EditorWindow
         mL_userModels.Clear();
         mL_userTextures.Clear();
         LoadTextures();
-        OffTheWall.LoadModels();       
-        
+      
+        OffTheWall.LoadModels();
+        usermodel_number = 0;
+
     }
 
 
